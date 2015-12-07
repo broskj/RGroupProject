@@ -1,0 +1,85 @@
+don't use density-based clustering - too many items
+plot (<>, genre) in 2d
+google scholar: imdb movie recommendations, similar (for literature section of report)
+
+relevant tables:
+	cast_info:
+		id, person_id (->name.id), movie_id (->title.id)
+	movie_info:
+		id, movie_id (->title.id), info (genre)
+	name:
+		id, name
+	title:
+		id, title, kind_id (1=movie)
+		
+/*		
+ * start here
+ * 
+ * describe q;
+ * +----------+---------+------+-----+---------+-------+
+ * | Field    | Type    | Null | Key | Default | Extra |
+ * +----------+---------+------+-----+---------+-------+
+ * | movie_id | int(11) | NO   |     | 0       |       |
+ * | title    | text    | NO   |     | NULL    |       |
+ * | genre    | text    | NO   |     | NULL    |       |
+ * | id       | int(11) | NO   |     | 0       |       |
+ * | name     | text    | NO   |     | NULL    |       |
+ * +----------+---------+------+-----+---------+-------+
+ * 
+ * sample queries:
+ * select * from q order by rand() limit 10;
+ * +----------+------------------------------------+---------+---------+-------------------+
+ * | movie_id | title                              | genre   | id      | name              |
+ * +----------+------------------------------------+---------+---------+-------------------+
+ * |  2872927 | Kaidan chibusa enoki               | Horror  | 4052359 | Tanabe, Torao     |
+ * |  2411704 | A Ranchman's Wooing                | Short   | 3476761 | Williams, Clara   |
+ * |  2977455 | Mad Dog Morgan                     | Western |  126260 | Barkham, Don      |
+ * |  3030159 | Mucha sangre                       | Action  | 1451181 | Naschy, Paul      |
+ * |  3379436 | The Oscar                          | Drama   |  102906 | Bacon, James      |
+ * |  3330942 | The Devil, the Servant and the Man | Short   | 3477678 | Williams, Kathlyn |
+ * |  2556292 | Chamatkar                          | Fantasy | 3298768 | Shobha            |
+ * |  2731850 | Free Willy 2: The Adventure Home   | Drama   |  454107 | Dalton, Wally     |
+ * |  2769905 | Gus                                | Drama   | 1600687 | Pierini, Anthony  |
+ * |  3356851 | The Juror                          | Drama   | 1709110 | Rini, Peter       |
+ * +----------+------------------------------------+---------+---------+-------------------+
+ * 
+ * select * from q where title='Evil Dead'
+ * +----------+-----------+--------+---------+----------------------+
+ * | movie_id | title     | genre  | id      | name                 |
+ * +----------+-----------+--------+---------+----------------------+
+ * |  2697990 | Evil Dead | Horror |  284361 | Butterworth, Stephen |
+ * |  2697990 | Evil Dead | Horror |  300231 | Campbell, Bruce      |
+ * |  2697990 | Evil Dead | Horror |  490421 | Degas, Rupert        |
+ * |  2697990 | Evil Dead | Horror |  536001 | Dorian, Bob          |
+ * |  2697990 | Evil Dead | Horror |  626934 | Fernandez, Shiloh    |
+ * |  2697990 | Evil Dead | Horror |  939040 | Inca                 |
+ * |  2697990 | Evil Dead | Horror | 1331181 | McLarty, Jim         |
+ * |  2697990 | Evil Dead | Horror | 1640652 | Pucci, Lou Taylor    |
+ * |  2697990 | Evil Dead | Horror | 2194874 | Willetts, Karl       |
+ * |  2697990 | Evil Dead | Horror | 2380065 | Blackmore, Elizabeth |
+ * |  2697990 | Evil Dead | Horror | 2491685 | Connolly, Phoenix    |
+ * |  2697990 | Evil Dead | Horror | 2917229 | Levy, Jane           |
+ * |  2697990 | Evil Dead | Horror | 2942018 | Lucas, Jessica       |
+ * |  2697990 | Evil Dead | Horror | 3258083 | Sandweiss, Ellen     |
+ * |  2697990 | Evil Dead | Horror | 3481865 | Wilson, Randal       |
+ * |  2697990 | Evil Dead | Horror |   45879 | Alvarez, Fede        |
+ * |  2697990 | Evil Dead | Horror | 3875914 | Shaw, Bryan          |
+ * |  2697990 | Evil Dead | Horror |   45879 | Alvarez, Fede        |
+ * |  2697990 | Evil Dead | Horror | 1659217 | Raimi, Sam           |
+ * |  2697990 | Evil Dead | Horror | 1808537 | Sayagues, Rodo       |
+ * +----------+-----------+--------+---------+----------------------+
+ */
+
+# temporary table of genre list (py script generates hundreds of weird ones - first 32 are normal)
+create table t as select distinct info from movie_info limit 32;
+
+# table combining attributes by key
+create table q as select t.id as movie_id, t.title, mi.info as genre, n.id, n.name from title t, movie_info mi, name n, cast_info where t.kind_id=1 and n.id=cast_info.person_id and t.id = cast_info.movie_id and t.id = mi.movie_id and mi.info not in (select info from t);
+
+# table no longer needed
+drop table t;
+
+#
+select count(distinct(movie_id)) from q;
+
+# TODO: get 10,000 random movies with all attributes: resulting table will be much larger than 10,000 rows
