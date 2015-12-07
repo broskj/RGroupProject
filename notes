@@ -29,7 +29,7 @@ relevant tables:
  * sample queries:
  * select * from q order by rand() limit 10;
  * +----------+------------------------------------+---------+---------+-------------------+
- * | movie_id | title                              | genre   | id      | name              |
+ * | movie_id | title                              | genre   | name_id | name              |
  * +----------+------------------------------------+---------+---------+-------------------+
  * |  2872927 | Kaidan chibusa enoki               | Horror  | 4052359 | Tanabe, Torao     |
  * |  2411704 | A Ranchman's Wooing                | Short   | 3476761 | Williams, Clara   |
@@ -43,9 +43,9 @@ relevant tables:
  * |  3356851 | The Juror                          | Drama   | 1709110 | Rini, Peter       |
  * +----------+------------------------------------+---------+---------+-------------------+
  * 
- * select * from q where title='Evil Dead'
+ * select * from q where title='Evil Dead';
  * +----------+-----------+--------+---------+----------------------+
- * | movie_id | title     | genre  | id      | name                 |
+ * | movie_id | title     | genre  | name_id | name                 |
  * +----------+-----------+--------+---------+----------------------+
  * |  2697990 | Evil Dead | Horror |  284361 | Butterworth, Stephen |
  * |  2697990 | Evil Dead | Horror |  300231 | Campbell, Bruce      |
@@ -74,7 +74,7 @@ relevant tables:
 create table t as select distinct info from movie_info limit 32;
 
 # table combining attributes by key
-create table q as select t.id as movie_id, t.title, mi.info as genre, n.id, n.name from title t, movie_info mi, name n, cast_info where t.kind_id=1 and n.id=cast_info.person_id and t.id = cast_info.movie_id and t.id = mi.movie_id and mi.info not in (select info from t);
+create table q as select t.id as movie_id, t.title, mi.info as genre, n.id as name_id, n.name from title t, movie_info mi, name n, cast_info where t.kind_id=1 and n.id=cast_info.person_id and t.id = cast_info.movie_id and t.id = mi.movie_id and mi.info not in (select info from t);
 
 # table no longer needed
 drop table t;
