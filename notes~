@@ -88,8 +88,8 @@ select count(distinct(movie_id)) from q;
 create table u as select distinct(movie_id) from q order by rand() limit 10000;
 
 # match q.movie_id with u.movie_id to generate table with 10,000 movies
-create table b as select * from q where q.movie_id in (select movie_id form u);
+create table a as select * from q where q.movie_id in (select movie_id form u);
 
 #
-select count(distinct(movie_id)) from b;
-select count(*) from b;
+select count(distinct(movie_id)) from a;
+select count(*) from a;
