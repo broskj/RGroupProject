@@ -22,7 +22,7 @@ relevant tables:
  * | movie_id | int(11) | NO   |     | 0       |       |
  * | title    | text    | NO   |     | NULL    |       |
  * | genre    | text    | NO   |     | NULL    |       |
- * | id       | int(11) | NO   |     | 0       |       |
+ * | name_id  | int(11) | NO   |     | 0       |       |
  * | name     | text    | NO   |     | NULL    |       |
  * +----------+---------+------+-----+---------+-------+
  * 
