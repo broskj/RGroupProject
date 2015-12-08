@@ -14,7 +14,7 @@ relevant tables:
 		id, title, kind_id (1=movie)
 
 mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
-mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/ --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n'
+mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n'
 ^?
 */
 
@@ -97,3 +97,7 @@ create table a as select * from q where q.movie_id in (select movie_id form u);
 #
 select count(distinct(movie_id)) from a;
 select count(*) from a;
+
+# added column to main table for person role
+create table b as select distinct a.movie_id, a.title, a.genre, a.name_id, a.name, rt.role from a a inner join cast_info ci on a.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
+
