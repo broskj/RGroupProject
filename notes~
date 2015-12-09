@@ -14,7 +14,7 @@ relevant tables:
 		id, title, kind_id (1=movie)
 
 mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
-mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/ --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n'
+mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n'
 ^?
 */
 
