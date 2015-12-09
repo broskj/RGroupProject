@@ -12,9 +12,11 @@ relevant tables:
 		id, name
 	title:
 		id, title, kind_id (1=movie)
+	movie_info_idx:
+		movie_id, info_type_id (1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross), info
 
 mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
-mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n'
+mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' && sudo mv /tmp/a.txt ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.csv && && sudo mv /tmp/a.sql ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
 ^?
 */
 
@@ -98,6 +100,27 @@ create table a as select * from q where q.movie_id in (select movie_id form u);
 select count(distinct(movie_id)) from a;
 select count(*) from a;
 
-# added column to main table for person role
+# add column to main table for person role
 create table b as select distinct a.movie_id, a.title, a.genre, a.name_id, a.name, rt.role from a a inner join cast_info ci on a.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
+
+# add column to main table for movie rating - info_type_id=101 -> rating
+create table c as select distinct b.movie_id, b.title, mi.info as rating, b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id = 101;
+
+# info_type_id=105 -> budget, but I dont have the .list.gz file downloaded, so selecting budget returns an empty set
+
+(1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross)
+
+# add columns to main table for rating, runtime, budget, gross, mpaa?
+create table v as select mi.movie_id, mi.info_type_id, mi.info from movie_info_idx mi where info_type_id=1 or info_type_id=97 or info_type_id=101 or info_type_id=105 or info_type_id=107;
+
+create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id = 101;
+
+
+
+
+
+
+
+
+
 
