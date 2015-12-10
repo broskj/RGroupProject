@@ -79,7 +79,7 @@ mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optio
  */
 
 # temporary table of genre list (py script generates hundreds of weird ones - first 32 are normal)
-create table t as select distinct info from movie_info limit 32;
+create table t as select distinct info from movie_info where info_type_id=3 limit 32;
 
 # table combining attributes by key
 create table q as select t.id as movie_id, t.title, mi.info as genre, n.id as name_id, n.name from title t, movie_info mi, name n, cast_info where t.kind_id=1 and n.id=cast_info.person_id and t.id = cast_info.movie_id and t.id = mi.movie_id and mi.info in (select info from t);
@@ -94,7 +94,7 @@ select count(distinct(movie_id)) from q;
 create table u as select distinct(movie_id) from q order by rand() limit 10000;
 
 # match q.movie_id with u.movie_id to generate table with 10,000 movies
-create table a as select * from q where q.movie_id in (select movie_id form u);
+create table a as select * from q where q.movie_id in (select movie_id from u);
 
 #
 select count(distinct(movie_id)) from a;
@@ -111,11 +111,18 @@ create table c as select distinct b.movie_id, b.title, mi.info as rating, b.genr
 (1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross)
 
 # add columns to main table for rating, runtime, budget, gross, mpaa?
-create table v as select mi.movie_id, mi.info_type_id, mi.info from movie_info_idx mi where info_type_id=1 or info_type_id=97 or info_type_id=101 or info_type_id=105 or info_type_id=107;
+create table v (info_type_id int(11));
+insert into v (info_type_id) values (1);
+insert into v (info_type_id) values (97);
+insert into v (info_type_id) values (99);
+insert into v (info_type_id) values (101);
+insert into v (info_type_id) values (105);
+insert into v (info_type_id) values (106);
+insert into v (info_type_id) values (107);
 
-create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id = 101;
+create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id in (select info_type_id from v);
 
-
+drop table v;
 
 
 
