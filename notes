@@ -124,3 +124,5 @@ insert into v (info_type_id) values (107);
 create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id in (select info_type_id from v);
 
 drop table v;
+
+create table d as select distinct c.movie_id, b.title, substring(mi.info from length(mi.info)-4) as year, c.rating, c.genre, c.name_id, c.name, c.role from c c inner join movie_info mi on c.movie_id = mi.movie_id and mi.info_type_id=16;
