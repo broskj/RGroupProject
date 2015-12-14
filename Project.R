@@ -10,6 +10,38 @@
 # Association Rule Mining - 'The Usual Casts'
 # Clustering - Finding similar Movies
 
+#####################################Edited##############################################################
+install.packages("e1071")
+install.packages("caret")
+install.packages("gmodels")
+library(e1071
+library(caret)
+library(gmodels)
+imdb <- read.csv("imdb.csv", stringsAsFactors = TRUE) 
+#naive bayes
+
+#Recognize diffent genres of movies
+set.seed(1071)
+
+#Creating the training and test datasets
+ind <- sample(2, nrow(imdb), replace=TRUE, prob=c(0.8, 0.2))
+#Create training labels of genre
+training.labels <- imdb[ind==1,3]
+#Create test labels of genre
+test.labels <- imdb[ind==2,3]
+#Create training set
+training <- imdb[ind==1,]
+#Create test set
+test <- imdb[ind==2,]
+
+A_classifier <- naiveBayes(training, training.labels)
+pred <- predict(A_classifier, test)
+x =  table(pred, test.labels)
+#Confusion Martix 
+print(confusionMatrix(x))
+CrossTable(pred, test.labels, prop.chisq = FALSE, prop.t = FALSE, dnn = c('predicted', 'actual'))
+#####################################Edited##############################################################
+
 # install packages
 if(require('RWeka')) {
 	library(RWeka)
