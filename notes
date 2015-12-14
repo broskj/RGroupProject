@@ -15,8 +15,8 @@ relevant tables:
 	movie_info(_idx):
 		movie_id, info_type_id (1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross), info
 
-mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
-mysqldump -u root -p imdb d --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' && sudo mv /tmp/d.txt ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.csv && && sudo mv /tmp/a.sql ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
+mysqldump -u root -p imdb_full m > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.sql
+mysqldump -u root -p imdb_full m --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' && sudo mv /tmp/m.txt ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.csv && sudo mv /tmp/m.sql ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.sql
 ^?
 */
 
@@ -121,7 +121,7 @@ create table k as select distinct j.movie_id, j.title, j.year, j.genre, mi.info 
 
 create table l as select distinct k.movie_id, k.title, k.year, k.genre, substring(mi.info from 7 for instr(mi.info, 'f')-7) as mpaa, k.rating, k.name_id, k.name from k k, movie_info mi where k.movie_id=mi.movie_id and mi.info_type_id=97;
 
-create table m as select distinct l.movie_id, l.title, l.year, l.genre, l.mpaa, l.rating, l.name_id, l.name, rt.role from l l inner join cast_info ci on a.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
+create table m as select distinct l.movie_id, l.title, l.year, l.genre, l.mpaa, l.rating, l.name_id, l.name, rt.role from lll l inner join cast_info ci on l.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
 
 create table u as select distinct(movie_id) from m order by rand() limit 10000;
 
