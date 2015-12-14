@@ -111,18 +111,18 @@ create table c as select distinct b.movie_id, b.title, mi.info as rating, b.genr
 
 # info_type_id=105 -> budget, but I dont have the .list.gz file downloaded, so selecting budget returns an empty set
 
-# add columns to main table for rating, runtime, budget, gross, mpaa?
-create table v (info_type_id int(11));
-insert into v (info_type_id) values (1);
-insert into v (info_type_id) values (97);
-insert into v (info_type_id) values (99);
-insert into v (info_type_id) values (101);
-insert into v (info_type_id) values (105);
-insert into v (info_type_id) values (106);
-insert into v (info_type_id) values (107);
+create table d as select distinct c.movie_id, c.title, substring(mi.info from length(mi.info)-4) as year, c.rating, c.genre, c.name_id, c.name, c.role from c c inner join movie_info mi on c.movie_id = mi.movie_id and mi.info_type_id=16;
 
-create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id in (select info_type_id from v);
+===
 
-drop table v;
+create table j as select distinct q.movie_id, q.title, substring(mi.info from length(mi.info)-4) as year, q.genre, q.name_id, q.name from q q, movie_info mi where q.movie_id = mi.movie_id and mi.info_type_id=16;
 
-create table d as select distinct c.movie_id, b.title, substring(mi.info from length(mi.info)-4) as year, c.rating, c.genre, c.name_id, c.name, c.role from c c inner join movie_info mi on c.movie_id = mi.movie_id and mi.info_type_id=16;
+create table k as select distinct j.movie_id, j.title, j.year, j.genre, mi.info as rating, j.name_id, j.name from j j, movie_info_idx mi where j.movie_id = mi.movie_id and mi.info_type_id=101;
+
+create table l as select distinct k.movie_id, k.title, k.year, k.genre, substring(mi.info from 7 for instr(mi.info, 'f')-7) as mpaa, k.rating, k.name_id, k.name from k k, movie_info mi where k.movie_id=mi.movie_id and mi.info_type_id=97;
+
+create table m as select distinct l.movie_id, l.title, l.year, l.genre, l.mpaa, l.rating, l.name_id, l.name, rt.role from l l inner join cast_info ci on a.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
+
+create table u as select distinct(movie_id) from m order by rand() limit 10000;
+
+create table ds as select * from m where m.movie_id in (select movie_id from u);

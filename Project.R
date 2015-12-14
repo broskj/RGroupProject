@@ -40,7 +40,7 @@ pause <- function() {
 
 # create training and test sets
 divideDataset <- function(dataframe, seed=NULL) {
-	if(!is.null(seed)) set.seed(1337)
+	if(!is.null(seed)) set.seed(0156)
 	index <- 1:nrow(dataframe)
 	trainindex <- sample(index, trunc(length(index)*0.8))
 	trainset <- dataframe[trainindex, ]
@@ -109,7 +109,7 @@ myRulePruning <- function(rules) {
 cat("=====Classification=====\n")
 # define randomized datasets
 cat("Splitting dataset...")
-ds$split <- divideDataset(ds, seed=0131)
+ds$split <- divideDataset(ds, seed=0156)
 # fit training sets
 cat("done.\n\nFitting training set...")
 pause()
