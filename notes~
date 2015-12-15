@@ -12,17 +12,17 @@ relevant tables:
 		id, name
 	title:
 		id, title, kind_id (1=movie)
-	movie_info_idx:
+	movie_info(_idx):
 		movie_id, info_type_id (1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross), info
 
-mysqldump -u root -p imdb a > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
-mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' && sudo mv /tmp/a.txt ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.csv && && sudo mv /tmp/a.sql ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb.sql
+mysqldump -u root -p imdb_full m > ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.sql
+mysqldump -u root -p imdb_full m --tab=/tmp --fields-terminated-by=',' --fields-optionally-enclosed-by='"' --lines-terminated-by='\n' && sudo mv /tmp/m.txt ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.csv && sudo mv /tmp/m.sql ~/Desktop/CIS4930/Projects/Group\ Project/RGroupProject/imdb_full.sql
 ^?
 */
 
-/*		
+/*
  * start here
- * 
+ *
  * describe q;
  * +----------+---------+------+-----+---------+-------+
  * | Field    | Type    | Null | Key | Default | Extra |
@@ -33,7 +33,7 @@ mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optio
  * | name_id  | int(11) | NO   |     | 0       |       |
  * | name     | text    | NO   |     | NULL    |       |
  * +----------+---------+------+-----+---------+-------+
- * 
+ *
  * sample queries:
  * select * from q order by rand() limit 10;
  * +----------+------------------------------------+---------+---------+-------------------+
@@ -50,7 +50,7 @@ mysqldump -u root -p imdb a --tab=/tmp --fields-terminated-by=',' --fields-optio
  * |  2769905 | Gus                                | Drama   | 1600687 | Pierini, Anthony  |
  * |  3356851 | The Juror                          | Drama   | 1709110 | Rini, Peter       |
  * +----------+------------------------------------+---------+---------+-------------------+
- * 
+ *
  * select * from q where title='Evil Dead';
  * +----------+-----------+--------+---------+----------------------+
  * | movie_id | title     | genre  | name_id | name                 |
@@ -96,6 +96,9 @@ create table u as select distinct(movie_id) from q order by rand() limit 10000;
 # match q.movie_id with u.movie_id to generate table with 10,000 movies
 create table a as select * from q where q.movie_id in (select movie_id from u);
 
+# u no longer needed - get movie ids again with 'select distinct(movie_id) from a;'
+drop table u;
+
 #
 select count(distinct(movie_id)) from a;
 select count(*) from a;
@@ -108,26 +111,18 @@ create table c as select distinct b.movie_id, b.title, mi.info as rating, b.genr
 
 # info_type_id=105 -> budget, but I dont have the .list.gz file downloaded, so selecting budget returns an empty set
 
-(1=runtime, 97=mpaa, 99=votes distribution, 101=rating, 105=budget, 106=weekend gross, 107=gross)
+create table d as select distinct c.movie_id, c.title, substring(mi.info from length(mi.info)-4) as year, c.rating, c.genre, c.name_id, c.name, c.role from c c inner join movie_info mi on c.movie_id = mi.movie_id and mi.info_type_id=16;
 
-# add columns to main table for rating, runtime, budget, gross, mpaa?
-create table v (info_type_id int(11));
-insert into v (info_type_id) values (1);
-insert into v (info_type_id) values (97);
-insert into v (info_type_id) values (99);
-insert into v (info_type_id) values (101);
-insert into v (info_type_id) values (105);
-insert into v (info_type_id) values (106);
-insert into v (info_type_id) values (107);
+===
 
-create table c as select distinct b.movie_id, b.title, mi.info as rating, mi.b.genre, b.name_id, b.name, b.role from b b inner join movie_info_idx mi on b.movie_id = mi.movie_id and mi.info_type_id in (select info_type_id from v);
+create table j as select distinct q.movie_id, q.title, substring(mi.info from length(mi.info)-4) as year, q.genre, q.name_id, q.name from q q, movie_info mi where q.movie_id = mi.movie_id and mi.info_type_id=16;
 
-drop table v;
+create table k as select distinct j.movie_id, j.title, j.year, j.genre, mi.info as rating, j.name_id, j.name from j j, movie_info_idx mi where j.movie_id = mi.movie_id and mi.info_type_id=101;
 
+create table l as select distinct k.movie_id, k.title, k.year, k.genre, substring(mi.info from 7 for instr(mi.info, 'f')-7) as mpaa, k.rating, k.name_id, k.name from k k, movie_info mi where k.movie_id=mi.movie_id and mi.info_type_id=97;
 
+create table m as select distinct l.movie_id, l.title, l.year, l.genre, l.mpaa, l.rating, l.name_id, l.name, rt.role from lll l inner join cast_info ci on l.name_id=ci.person_id inner join role_type rt on ci.role_id=rt.id;
 
+create table u as select distinct(movie_id) from m order by rand() limit 10000;
 
-
-
-
-
+create table ds as select * from m where m.movie_id in (select movie_id from u);
