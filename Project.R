@@ -11,14 +11,14 @@
 # Clustering - Finding similar Movies
 
 #####################################Edited##############################################################
+#naive bayes
 install.packages("e1071")
 install.packages("caret")
 install.packages("gmodels")
 library(e1071
 library(caret)
 library(gmodels)
-imdb <- read.csv("imdb.csv", stringsAsFactors = TRUE) 
-#naive bayes
+imdb <- read.csv("imdb.csv", stringsAsFactors = TRUE)
 
 #Recognize diffent genres of movies
 set.seed(1071)
@@ -40,6 +40,26 @@ x =  table(pred, test.labels)
 #Confusion Martix 
 print(confusionMatrix(x))
 CrossTable(pred, test.labels, prop.chisq = FALSE, prop.t = FALSE, dnn = c('predicted', 'actual'))
+#####################################Edited##############################################################
+#Kmeans
+install.packages("fpc", dependencies = TRUE)
+install.packages("MCL", dependencies = TRUE)
+install.packages("rgl", dependencies = TRUE)
+library('fpc')
+library('MCL')
+library('rgl')
+#read in the data
+imdb <- read.csv("imdb_full.csv", header = TRUE, stringsAsFactors = TRUE) 
+#Preprocess the data by removing unecessary attributes from the data set
+imdb <- imdb[-c(1,2,3,7,8,9)]
+#Convert qualititave values into numeric values based on factor levels
+imdb[, 1:2] <- apply(imdb[, 1:2], 2, function(x) as.numeric(as.factor(x)))
+#Apply kmeans clustering with 28 clusters
+head(imdb)
+km <- kmeans(imdb, 28)
+#Plotting the data
+print(km)
+plot3d(imdb[,1], imdb[,2],imdb[,3], "Genre", "MPAA", "Rating", col = km$cluster)
 #####################################Edited##############################################################
 
 # install packages
